@@ -1,4 +1,4 @@
-PHONY: deploy, remove
+PHONY: deploy, remove, pull
 
 deploy:
 	docker stack deploy \
@@ -7,3 +7,9 @@ deploy:
 
 remove:
 	docker stack rm nasomedia
+
+pull:
+	docker pull hwc9169/nasomedia-main-service:latest\
+	hwc9169/nasomedia-identity-service:latest\
+	hwc9169/nasomedia-library-service:latest\
+	hwc9169/nasomedia-cash-service:latest
