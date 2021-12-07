@@ -1,0 +1,148 @@
+version: '3'
+
+services:
+  main_service:
+    image: hwc9169/nasomedia-main-service:latest
+    ports:
+      - "80:80"
+    env_file:
+      - .main.env
+    depends_on:
+      - db
+    command: >
+      bash -c "/app/prestart.sh 
+      && uvicorn app.main:app --host 0.0.0.0 --port 80"
+    networks:
+      servicenet:
+        aliases:
+          - main
+      main_internal:
+    deploy:
+      replicas: 1
+
+  main_postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - main-postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .main.env
+    networks:
+      main_internal:
+        aliases:
+          - db
+    deploy:
+      replicas: 1
+  
+  identity_service:
+    image: hwc9169/nasomedia-identity-service:latest
+    ports:
+      - "81:80"
+    env_file:
+      - .identity.env
+    depends_on:
+      - db
+    command: >
+      bash -c "/app/prestart.sh 
+      && uvicorn app.main:app --host 0.0.0.0 --port 80"
+    networks:
+      servicenet:
+        aliases:
+          - identity
+      identity_internal:
+    deploy:
+      replicas: 1
+
+  identity_postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - identity-postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .identity.env
+    networks:
+      identity_internal:
+        aliases:
+          - db
+    deploy:
+      replicas: 1
+
+  library_service:
+    image: hwc9169/nasomedia-library-service:latest
+    ports:
+      - "82:80"
+    env_file:
+      - .library.env
+    depends_on:
+      - db
+    command: >
+      bash -c "/app/prestart.sh 
+      && uvicorn app.main:app --host 0.0.0.0 --port 80"
+    networks:
+      servicenet:
+        aliases:
+          - library
+      library_internal:
+    deploy:
+      replicas: 1
+
+  library_postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - library-postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .library.env
+    networks:
+      library_internal:
+        aliases:
+          - db
+    deploy:
+      replicas: 1
+
+  cash_service:
+    image: hwc9169/nasomedia-cash-service:latest
+    ports:
+      - "83:80"
+    env_file:
+      - .cash.env
+    depends_on:
+      - db
+    command: >
+      bash -c "/app/prestart.sh 
+      && uvicorn app.main:app --host 0.0.0.0 --port 80"
+    networks:
+      servicenet:
+        aliases:
+          - cash
+      cash_internal:
+    deploy:
+      replicas: 1
+
+  cash_postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - cash-postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .cash.env
+    networks:
+      cash_internal:
+        aliases:
+          - db
+    deploy:
+      replicas: 1
+
+volumes:
+  main-postgres-data:
+  identity-postgres-data:
+  library-postgres-data:
+  cash-postgres-data:
+
+networks:
+  servicenet:
+    external: true
+  main_internal:
+  identity_internal:
+  library_internal:
+  cash_internal:
